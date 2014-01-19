@@ -7,17 +7,19 @@ These are the regualr expressions used to scrape the data from the prose.
 /Total ridership on MTA subways, trains and buses in (\w*) (\d{4}) was (\d+\.?\d+) million, an? (increase|decrease) of (\d+\.?\d*) percent from (\1) (\d{4})/
 
 Data placed into array positions: 
+
 //1 - month
 //2 - year
 //3 - ridership in millions
-*Not used in current script:*
+(*Not used in current script:*)
 //4 - increase/decrease
 //5 - percent
 //7 - year previous
 
 #### Subway Ridership only 
 
-/Subway(?:\s+)ridership(?:\s+)in(?:\s+)(\w+)(?:\s+)(\d{4})(?:\s+)was(?:\s+)(\d+\.\d+)(?:\s+)million,(?:\s+)an?(?:\s+)(increase|decrease)(?:\s+)of(?:\s+)(\d+\.\d+)(?:\s+)percent(?:\s+)from(?:\s+)(\1)(?:\s+)(\d{4})/
+
+/Subway(?:\s+)ridership(?:\s+)in(?:\s+)(\w+)(?:\s+)(\d{4})(?:\s+)was(?:\s+)(\d+\.\d+)(?:\s+)million,(?:\s+)an?(?:\s+)(increase|decrease)(?:\s+)of(?:\s+)(\d+\.\d+)(?:\s+)percent(?:\s+)from(?:\s+)(\1)(?:\s+)(\d{4})/ //*This regex gives an example of how to account for variable white space*
 
 /In (\w+) (20\d{2}), subway ridership was (\d+\.?\d+) million, an? (increase|decrease) of (\d+\.?\d+) percent from (\w+) (20\d{2})/
 
