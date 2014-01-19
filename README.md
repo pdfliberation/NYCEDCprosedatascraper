@@ -3,6 +3,8 @@ NYCEDC Newsletter Prose Data Scraper
 
 This use regex (in php, but can be any language) get data from the NYC EDC newsletters
 
+[See script run.](http://sandersonmichael.com/nycedc/getDatafromEDC.php)
+
 ###Process:
 
 First, we extreacted the text from the PDF files using a Mac "Get Text" tool to extract the data.
