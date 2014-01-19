@@ -31,8 +31,8 @@ for ($yearloop = 2005; $yearloop < 2014; $yearloop++) {
             continue;
         }
 
-        //necessary for some PDFs
-        $text = preg_replace("/\\nI\\b/us", "", $text);
+        //NOTE: USE THIS WHEN RETURNING EDC NEWSLETTER TEXT FROM RUBY
+        //$text = preg_replace("/\\nI\\b/us", "", $text);
 
         $MTAridership = array();
         if (!preg_match("/Total ridership on MTA subways, trains and buses, and bridge and tunnel use in (\\w+) (\\d{4}) was (\\d+\\.?\\d*) million, a (\\d+\\.?\\d*) percent (increase) from (\\1) (\\d{4})/um", $text, $MTAridership))
