@@ -1,4 +1,3 @@
-file emptyfile emptyfile empty
 MTA Ridership (millions):
 (month can be converted to numeric)
 "month",year,total_ridership,subway_ridership
