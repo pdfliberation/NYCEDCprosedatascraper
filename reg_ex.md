@@ -32,6 +32,8 @@ Data placed into array positions:
 ####Domestic/Internation Breakdown
 /Domestic air carriers accounted for (\d+\.?\d*) million passengers, a? ?(up|down)? (\d+\.?\d*) percent(?:.*) ((\d+\.?\d*)) million passengers traveled with international air carriers/
 
+Domestic air carriers accounted for (\d+\.\d+) million passengers.*(\d+\.\d+) million passengers traveled with international air carriers
+
 ###Hotel Occupancy
 
 /In (\w*) (20\d{2}), the average daily hotel room rate was \$(\d+).* Hotel occupancy was (\d{2}\.?\d*) percent/
