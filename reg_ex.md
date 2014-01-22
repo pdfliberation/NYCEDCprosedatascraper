@@ -1,4 +1,4 @@
-##Regualr Expressions
+##Regular Expressions
 
 These are the regualr expressions used to scrape the data from the prose. 
 
