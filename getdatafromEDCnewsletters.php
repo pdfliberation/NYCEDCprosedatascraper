@@ -10,7 +10,6 @@
  * Date: 1/18/14
  * Time: 4:25 PM
  */
- 
 $MTAData = array();
 $AirportData = array();
 $HotelData = array();
@@ -22,17 +21,17 @@ for ($yearloop = 2005; $yearloop < 2014; $yearloop++) {
 
         //there was some text issue coverting to txt, using rtf fixed that
         $monthyearsting = sprintf('%02d', $monthloop) . " " . sprintf('%01d', $yearloop) . ".rtf";
+        $NewsletterYearMonthString = $yearloop . '-' . sprintf('%02d', $monthloop);
         ///echo "<h3>" . $monthyearsting . "</h3>\n";
         $text = file_get_contents($monthyearsting);
         //echo $text;
         if (empty($text))
         {
-            echo 'file empty';
             continue;
         }
 
-        //NOTE: USE THIS WHEN RETURNING EDC NEWSLETTER TEXT FROM RUBY
-        //$text = preg_replace("/\\nI\\b/us", "", $text);
+        //necessary for some PDFs
+        $text = preg_replace("/\\nI\\b/us", "", $text);
 
         $MTAridership = array();
         if (!preg_match("/Total ridership on MTA subways, trains and buses, and bridge and tunnel use in (\\w+) (\\d{4}) was (\\d+\\.?\\d*) million, a (\\d+\\.?\\d*) percent (increase) from (\\1) (\\d{4})/um", $text, $MTAridership))
@@ -88,29 +87,16 @@ for ($yearloop = 2005; $yearloop < 2014; $yearloop++) {
                 'year' => $year,
                 'total ridership' => $ridershipINMillions,
                 'total includes bridges and tunnels' => $includesBridgesAndTunnels,//not used
-                'subway ridership' => $SubwayridershipINMillions
+                'subway ridership' => $SubwayridershipINMillions,
+                'reported' => $NewsletterYearMonthString
             );
             $MTAData[] = $MTADataOneMonth;
 
 
 //match air travel
 
-        //var_dump($airTravel);
-//1 - month
-//2 - year
-//3 - ridership in millions
-//4 - increase or decrease
-//5 - percent
-//7 - previousyear
-//8 - domestic in millions
-//9 - percent
-//10 - increaseOrDecrease
-//11 - international in millions
-//12 - percent
-//13 - increase or decrease
-
         $airtravel2 = array();
-        if(preg_match("/In (\\w+) (\\d{4}), (\\d+\\.?\\d*) million passengers flew in(?:to)? and out of the region\\Ws airports, (?:a (\\d+\\.?\\d*) percent increase|a decrease of 0.2 percent) from (\\1) (\\d{4})( passenger levels)?/us", $text, $airtravel2) == 0) {
+        if(preg_match("/In (\\w+) (\\d{4}), (\\d+\\.?\\d*) million passengers flew in(?:to)? and out of the region\\Ws airports, (?:a (\\d+\\.?\\d*) percent increase|an? (?:decrease|increase) of (\\d+\\.?\\d*) percent) from (\\1) (\\d{4})( passenger levels)?/us", $text, $airtravel2) == 0) {
 
             preg_match("/Passengers in NYC area airports totaled (\\d+\\.?\\d*) million in (\\w*) (\\d{4}), up (\\d\\.?\\d*) percent from (\\2) (\\d{4})/us",$text, $airtravel2 );
             $month = $airtravel2[2];
@@ -128,8 +114,7 @@ for ($yearloop = 2005; $yearloop < 2014; $yearloop++) {
         //check as added:
         //Echo "\n<br>Air traffic: $month $year: $totalTravelRidership million total \n";
 
-        preg_match("/Domestic air carriers accounted for (\\d+\\.?\\d*) million passengers, a? ?(up|down)? (\\d+\\.?\\d*) percent(?:.*) ((\\d+\\.?\\d*)) million passengers traveled with international air carriers/us", $text, $airtravel2 );
-
+         if (preg_match("/Domestic air carriers accounted for (\\d+\\.?\\d*) million passengers, a? ?(up|down)? (\\d+\\.?\\d*) percent(?:.*) ((\\d+\\.?\\d*)) million passengers traveled with international air carriers/us", $text, $airtravel2 ))
         {
             $domesticTotal = $airtravel2[1];
             $domesticUpDown = $airtravel2[2];
@@ -137,6 +122,12 @@ for ($yearloop = 2005; $yearloop < 2014; $yearloop++) {
             $InternationalTotal = $airtravel2[4];
             //check as added:
             //Echo "\n<br>Domestic travelers: $domesticTotal million. Intenational: $InternationalTotal million";
+        } else {
+            preg_match("/Domestic air carriers accounted for (\\d+\\.\\d+) million passengers.*(\\d+\\.\\d+) million passengers traveled with international air carriers/us", $text, $airtravel2);
+            $domesticTotal = $airtravel2[1];
+            $InternationalTotal = $airtravel2[2];
+
+
         }
 
         $airportOneMonth = array(
@@ -144,7 +135,8 @@ for ($yearloop = 2005; $yearloop < 2014; $yearloop++) {
             'year' => $year,
             'total_passengers' => $totalTravelRidership,
             'domestic' => $domesticTotal,
-            'international' => $InternationalTotal
+            'international' => $InternationalTotal,
+            'reported' => $NewsletterYearMonthString
         );
 
         $AirportData[] = $airportOneMonth;
@@ -165,7 +157,8 @@ for ($yearloop = 2005; $yearloop < 2014; $yearloop++) {
             'month' => $month,
             'year' => $year,
             'average rate' => $averageRate,
-            'percent occupancy' => $percentAverage
+            'percent occupancy' => $percentAverage,
+            'reported' => $NewsletterYearMonthString
 
         );
 
@@ -188,7 +181,8 @@ for ($yearloop = 2005; $yearloop < 2014; $yearloop++) {
             'ending year' => $endingYear,
             'ending day' => $endingDay,
             'four or five weeks' => $fourOrFiveWeeks,
-            'attendance' => $broadwayAttendance
+            'attendance' => $broadwayAttendance,
+            'reported' => $NewsletterYearMonthString
         );
 
         $BroadwayData[] = $BroadwayOneMonthPeriod;
@@ -197,8 +191,8 @@ for ($yearloop = 2005; $yearloop < 2014; $yearloop++) {
 
 
 echo "<h3>MTA Ridership (millions):</h3>";
-echo '(month can be converted to numeric)<br/>';
-echo '"month",year,total_ridership,subway_ridership<br/>';
+echo 'Original source: Metropolitan Transportation Authority<br/>';
+echo 'reported_year-month,stat_year-month,total_ridership,subway_ridership<br/>';
 
 foreach ($MTAData as $MTAOneMonth)
 {
@@ -206,44 +200,47 @@ foreach ($MTAData as $MTAOneMonth)
         continue;
     }
 
-    echo '"'. $MTAOneMonth['month'] . '", ' . $MTAOneMonth['year']  . ', ' . $MTAOneMonth['total ridership'] . ', ' . $MTAOneMonth['subway ridership'] . '<br/>'."\n";
+    echo $MTAOneMonth['reported'] . "," .  $MTAOneMonth['year']  . '-' . date('m', strtotime($MTAOneMonth['month'])) . ', ' . $MTAOneMonth['total ridership'] . ', ' . $MTAOneMonth['subway ridership'] . '<br/>'."\n";
 
 }
 
 echo "<h3>Airport Passenger Volume (millions)</h3>";
-echo '"month",year,total_passengers,domestic,international<br/>';
+echo 'Original source: Port Authority of New York and New Jersey<br>';
+echo 'reported_year-month,stat_year-month,total_passengers,domestic,international<br/>';
 foreach ($AirportData as $AirPortOneMonth)
 {
     if (empty($AirPortOneMonth['month'])){
         continue;
     }
-    echo '"'. $AirPortOneMonth['month'] . '", ' . $AirPortOneMonth['year']  . ', ' . $AirPortOneMonth['total_passengers']  . ', ' . $AirPortOneMonth['domestic']  . ', ' . $AirPortOneMonth['international']  . '</br>' . "\n";
+    echo $AirPortOneMonth['reported'] . "," . $AirPortOneMonth['year'] . '-' . date('m', strtotime($AirPortOneMonth['month']))  . ', ' . $AirPortOneMonth['total_passengers']  . ', ' . $AirPortOneMonth['domestic']  . ', ' . $AirPortOneMonth['international']  . '</br>' . "\n";
 
 }
 
 echo "<h3>Hotel Rates and Occupancy</h3>";
-echo '"month",year,average_rate,occupancy_percent<br/>';
+echo 'reported_year-month,stat_year-month,average_rate,occupancy_percent<br/>';
 foreach ($HotelData as $HotelOneMonth)
 {
     if (empty($HotelOneMonth['month'])){
         continue;
     }
-    echo '"'. $HotelOneMonth['month'] . '", ' . $HotelOneMonth['year']  . ', ' . $HotelOneMonth['average rate']  . ', ' . $HotelOneMonth['percent occupancy']  . '</br>' . "\n";
+    echo $HotelOneMonth['reported'] . "," .$HotelOneMonth['year']  . '-' . date('m', strtotime($HotelOneMonth['month'])) . ', ' . $HotelOneMonth['average rate']  . ', ' . $HotelOneMonth['percent occupancy']  . '</br>' . "\n";
 
 }
 
 echo "<h3>Broadway Attendance (by four or five week period)</h3>";
-echo '(raw scrape values)<br/>';
-echo 'period_ending_year,period_ending_month,period_ending_day,number_of_weeks,attendance<br/>';
+echo 'reported_year-month,stat_period_ending_year-month-day,number_of_weeks,attendance<br/>';
 foreach ($BroadwayData as $BroadwayOneMonth)
 {
     if (empty($BroadwayOneMonth['ending month'])){
         continue;
     }
 
-    echo ''. $BroadwayOneMonth['ending year'] . ', "' . $BroadwayOneMonth['ending month']  . '", ' . $BroadwayOneMonth['ending day']  . ', ' . $BroadwayOneMonth['four or five weeks'] . ', ' . $BroadwayOneMonth['attendance']  . '</br>' . "\n";
+    $weeksInt = $BroadwayOneMonth['four or five weeks'] == 'five' ? 5 : 4;
+
+    echo $BroadwayOneMonth['reported'] . ',' . $BroadwayOneMonth['ending year'] . '-' . date('m', strtotime($BroadwayOneMonth['ending month'])) . '-' . sprintf('%02d', $BroadwayOneMonth['ending day'])  . ', ' . $weeksInt . ', ' . $BroadwayOneMonth['attendance']  . '</br>' . "\n";
 
 }
+
 
 
 ?>
